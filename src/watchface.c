@@ -18,9 +18,10 @@
 
 #define MAX_WIDTH 144
 #define MAX_HEIGHT 137
-#define MIN_STARS_SMALL 8
+#define MIN_STARS_SMALL 12
 #define MAX_STARS_SMALL 24
-#define MAX_STARS_MEDIUM 6
+#define MIN_STARS_MEDIUM 4
+#define MAX_STARS_MEDIUM 8
 #define MAX_STARS_BIG 4
 #define MAX_ASTEROIDS_SMALL 3
 #define MAX_ASTEROIDS_MEDIUM  2
@@ -47,6 +48,9 @@ static GBitmap *sprite_star_medium, *sprite_star_big_1, *sprite_star_big_2, *spr
 
 void show_time(char *time){
 	text_layer_set_text(label_time, time);
+	// DEV ONLY!!
+	seed = rand();
+	layer_mark_dirty(layer_space);
 }
 
 void show_date(char *date,char *day){
@@ -87,7 +91,7 @@ static void space_update_callback(Layer *me, GContext* ctx) {
 		graphics_draw_pixel(ctx, (GPoint){x,y});		
 	}
 		
-	for(i=0; i<rand()%MAX_STARS_MEDIUM; i++){
+	for(i=0; i<MIN_STARS_MEDIUM + rand()%(MAX_STARS_MEDIUM-MIN_STARS_MEDIUM); i++){
 		x = rand() % MAX_WIDTH;
 		y = rand() % MAX_HEIGHT;
 		graphics_draw_bitmap_in_rect(ctx, sprite_star_medium, (GRect) { 
