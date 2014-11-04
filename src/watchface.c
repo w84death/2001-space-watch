@@ -16,6 +16,16 @@
 #include "watchface.h"
 #include <pebble.h>
 
+#define MAX_WIDTH 144
+#define MAX_HEIGHT 137
+#define MIN_STARS_SMALL 8
+#define MAX_STARS_SMALL 24
+#define MAX_STARS_MEDIUM 6
+#define MAX_STARS_BIG 4
+#define MAX_ASTEROIDS_SMALL 3
+#define MAX_ASTEROIDS_MEDIUM  2
+#define MAX_ASTEROIDS_BIG 2
+
 static Window *s_window;
 static GBitmap *s_res_footer;
 static GBitmap *s_res_frame;
@@ -24,7 +34,6 @@ static GFont s_res_gothic_18;
 static GFont s_res_gothic_28;
 static GBitmap *s_res_logo;
 static BitmapLayer *layer_footer;
-static BitmapLayer *layer_space;
 static BitmapLayer *layer_frame;
 static TextLayer *label_time;
 static TextLayer *label_date;
@@ -32,6 +41,9 @@ static TextLayer *label_batt;
 static TextLayer *label_day;
 static BitmapLayer *layer_logo;
 static char battery_level[] = "000%";
+static Layer *layer_space;
+static int seed;
+static GBitmap *sprite_star_medium, *sprite_star_big_1, *sprite_star_big_2, *sprite_asteroid_small, *sprite_asteroid_medium, *sprite_asteroid_big;
 
 void show_time(char *time){
 	text_layer_set_text(label_time, time);
@@ -40,11 +52,92 @@ void show_time(char *time){
 void show_date(char *date,char *day){
 	text_layer_set_text(label_date, date);
 	text_layer_set_text(label_day, day);
+	seed = *day - 0;
 }
 
 void update_battery(int level){
 	snprintf(battery_level, sizeof(battery_level), "%i%%", level);
 	text_layer_set_text(label_batt, battery_level);
+}
+
+static void space_update_callback(Layer *me, GContext* ctx) {
+	graphics_context_set_compositing_mode(ctx,GCompOpOr);
+  GRect bounds_star_medium = sprite_star_medium->bounds;
+	GRect bounds_star_big_1 = sprite_star_big_1->bounds;
+	GRect bounds_star_big_2 = sprite_star_big_2->bounds;
+	GRect bounds_asteroid_small = sprite_asteroid_small->bounds;
+	GRect bounds_asteroid_medium = sprite_asteroid_medium->bounds;
+	GRect bounds_asteroid_big = sprite_asteroid_big->bounds;
+	int x, y, i;
+	
+	srand(seed);
+		
+	// STARTS
+	graphics_context_set_stroke_color(ctx, GColorWhite);
+	
+	for(i=0; i<MIN_STARS_SMALL + rand()%(MAX_STARS_SMALL-MIN_STARS_SMALL); i++){
+		x = rand() % MAX_WIDTH;
+		y = rand() % MAX_HEIGHT;
+		graphics_draw_pixel(ctx, (GPoint){x,y});		
+	}
+		
+	for(i=0; i<rand()%MAX_STARS_MEDIUM; i++){
+		x = rand() % MAX_WIDTH;
+		y = rand() % MAX_HEIGHT;
+		graphics_draw_bitmap_in_rect(ctx, sprite_star_medium, (GRect) { 
+			.origin = { x, y }, 
+				.size = bounds_star_medium.size
+		});		
+	}
+	
+	for(i=0; i<rand()%MAX_STARS_BIG;i++){
+		x = rand() % MAX_WIDTH;
+		y = rand() % MAX_HEIGHT;
+		if(rand()%10 > 4){
+			graphics_draw_bitmap_in_rect(ctx, sprite_star_big_1, (GRect) { 
+				.origin = { x, y }, 
+					.size = bounds_star_big_1.size
+			});
+		}else{
+			graphics_draw_bitmap_in_rect(ctx, sprite_star_big_2, (GRect) { 
+				.origin = { x, y }, 
+					.size = bounds_star_big_2.size
+			});
+		}
+	}
+	
+	
+	// ASTEROIDS
+	
+	for(i=0; i<rand()%MAX_ASTEROIDS_SMALL; i++){
+		x = rand() % MAX_WIDTH;
+		y = rand() % MAX_HEIGHT;
+		graphics_draw_bitmap_in_rect(ctx, sprite_asteroid_small, (GRect) { 
+			.origin = { x, y }, 
+				.size = bounds_asteroid_small.size
+		});	
+	}
+	
+	for(i=0; i<rand()%MAX_ASTEROIDS_MEDIUM; i++){
+		x = rand() % MAX_WIDTH;
+		y = rand() % MAX_HEIGHT;
+		graphics_draw_bitmap_in_rect(ctx, sprite_asteroid_medium, (GRect) { 
+			.origin = { x, y }, 
+				.size = bounds_asteroid_medium.size
+		});	
+	}
+	
+	for(i=0; i<rand()%MAX_ASTEROIDS_BIG; i++){
+		x = rand() % MAX_WIDTH;
+		y = rand() % MAX_HEIGHT;
+		graphics_draw_bitmap_in_rect(ctx, sprite_asteroid_big, (GRect) { 
+			.origin = { x, y }, 
+				.size = bounds_asteroid_big.size
+		});	
+	}
+	
+	// CUSTOM EVENTS
+	
 }
 
 static void initialise_ui(void) {
@@ -65,11 +158,14 @@ static void initialise_ui(void) {
   layer_add_child(window_get_root_layer(s_window), (Layer *)layer_footer);
   
   // layer_space
-  layer_space = bitmap_layer_create(GRect(0, 0, 144, 137));
+  layer_space = layer_create(GRect(0, 0, 144, 137));
   layer_add_child(window_get_root_layer(s_window), (Layer *)layer_space);
+	layer_set_update_proc(layer_space, space_update_callback);
   
   // layer_frame
   layer_frame = bitmap_layer_create(GRect(0, 0, 144, 137));
+	bitmap_layer_set_background_color(layer_frame, GColorClear);
+  bitmap_layer_set_compositing_mode(layer_frame, GCompOpOr);
   bitmap_layer_set_bitmap(layer_frame, s_res_frame);
   layer_add_child(window_get_root_layer(s_window), (Layer *)layer_frame);
   
@@ -110,12 +206,20 @@ static void initialise_ui(void) {
   layer_logo = bitmap_layer_create(GRect(14, 14, 15, 18));
   bitmap_layer_set_bitmap(layer_logo, s_res_logo);
   layer_add_child(window_get_root_layer(s_window), (Layer *)layer_logo);
+	
+	// sprites
+	sprite_star_medium = gbitmap_create_with_resource(RESOURCE_ID_STAR_MEDIUM); 
+	sprite_star_big_1 = gbitmap_create_with_resource(RESOURCE_ID_STAR_BIG_1); 
+	sprite_star_big_2  = gbitmap_create_with_resource(RESOURCE_ID_STAR_BIG_2); 
+	sprite_asteroid_small = gbitmap_create_with_resource(RESOURCE_ID_ASTEROID_SMALL); 
+	sprite_asteroid_medium = gbitmap_create_with_resource(RESOURCE_ID_ASTEROID_MEDIUM); 
+	sprite_asteroid_big = gbitmap_create_with_resource(RESOURCE_ID_ASTEROID_BIG); 
 }
 
 static void destroy_ui(void) {
   window_destroy(s_window);
   bitmap_layer_destroy(layer_footer);
-  bitmap_layer_destroy(layer_space);
+  layer_destroy(layer_space);
   bitmap_layer_destroy(layer_frame);
 	text_layer_destroy(label_time);
   text_layer_destroy(label_date);
@@ -125,8 +229,13 @@ static void destroy_ui(void) {
   gbitmap_destroy(s_res_footer);
   gbitmap_destroy(s_res_frame);
   gbitmap_destroy(s_res_logo);
+	gbitmap_destroy(sprite_star_medium);
+	gbitmap_destroy(sprite_star_big_1);
+	gbitmap_destroy(sprite_star_big_2);
+	gbitmap_destroy(sprite_asteroid_small);
+	gbitmap_destroy(sprite_asteroid_medium);
+	gbitmap_destroy(sprite_asteroid_big);
 }
-// END AUTO-GENERATED UI CODE
 
 static void handle_window_unload(Window* window) {
   destroy_ui();
@@ -134,6 +243,9 @@ static void handle_window_unload(Window* window) {
 
 void show_watchface(void) {
   initialise_ui();
+	
+	layer_mark_dirty(layer_space);
+	
   window_set_window_handlers(s_window, (WindowHandlers) {
     .unload = handle_window_unload,
   });

@@ -9,6 +9,31 @@
     "resources": {
         "media": [
             {
+                "file": "images/asteroid_big.png",
+                "name": "ASTEROID_BIG",
+                "type": "png"
+            },
+            {
+                "file": "images/asteroid_medium.png",
+                "name": "ASTEROID_MEDIUM",
+                "type": "png"
+            },
+            {
+                "file": "images/star_2.png",
+                "name": "STAR_BIG_2",
+                "type": "png"
+            },
+            {
+                "file": "images/star_1.png",
+                "name": "STAR_BIG_1",
+                "type": "png"
+            },
+            {
+                "file": "images/star_small.png",
+                "name": "STAR_MEDIUM",
+                "type": "png"
+            },
+            {
                 "file": "images/p1x_logo.png",
                 "name": "LOGO",
                 "type": "png"
