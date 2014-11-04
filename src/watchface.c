@@ -61,6 +61,12 @@ void update_battery(int level){
 }
 
 static void space_update_callback(Layer *me, GContext* ctx) {
+	/*
+	
+		DEEP SPACE PROCEDURAL GENERATION
+		work-in-progress
+	
+	*/
 	graphics_context_set_compositing_mode(ctx,GCompOpOr);
   GRect bounds_star_medium = sprite_star_medium->bounds;
 	GRect bounds_star_big_1 = sprite_star_big_1->bounds;
