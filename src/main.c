@@ -23,12 +23,16 @@ static bool refresh_date = true;
 	
 void tick_handler(struct tm *tick_time, TimeUnits units_changed)
 {
-	strftime(the_time, sizeof("00:00"), "%H:%M", tick_time);
+	strftime(the_time, sizeof(the_time),clock_is_24h_style()?"%H:%M":"%I:%M", tick_time);
 	strftime(date_text, sizeof(date_text), "%d %B %y", tick_time);
 	strftime(day_num, sizeof(day_num), "%j", tick_time);
-	
+		
 	if(units_changed & DAY_UNIT){
 		refresh_date = true;
+	}
+	
+	if(units_changed & HOUR_UNIT ){
+		hyperspace();
 	}
 	
 	if(refresh_date){
