@@ -1,0 +1,46 @@
+{
+    "appKeys": {},
+    "capabilities": [
+        ""
+    ],
+    "companyName": "w84death@gmail.com",
+    "longName": "2001: Space Watch",
+    "projectType": "native",
+    "resources": {
+        "media": [
+            {
+                "file": "images/p1x_logo.png",
+                "name": "LOGO",
+                "type": "png"
+            },
+            {
+                "file": "images/menu_icon.png",
+                "menuIcon": true,
+                "name": "ICON",
+                "type": "png"
+            },
+            {
+                "file": "images/asteroid_small.png",
+                "name": "ASTEROID_SMALL",
+                "type": "png"
+            },
+            {
+                "file": "images/frame.png",
+                "name": "FRAME",
+                "type": "png"
+            },
+            {
+                "file": "images/footer.png",
+                "name": "FOOTER",
+                "type": "png"
+            }
+        ]
+    },
+    "shortName": "2001: Space Watch",
+    "uuid": "4d5b30cf-0896-407b-bda9-aca85ceaef6b",
+    "versionCode": 1,
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": true
+    }
+}
