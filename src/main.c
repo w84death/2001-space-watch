@@ -16,29 +16,38 @@
 #include <pebble.h>
 #include <watchface.h>
 
+#define LAST_SEED_TIMESTAMP 1
 static char the_time[] = "00:00";
 static char date_text[] = "00 Xxxxxxxxx 0000";
 static char day_num[] = "000";
 static bool refresh_date = true;
-	
-void tick_handler(struct tm *tick_time, TimeUnits units_changed)
-{
+static bool refresh_seed = true;
+
+void tick_handler(struct tm *tick_time, TimeUnits units_changed){
 	strftime(the_time, sizeof(the_time),clock_is_24h_style()?"%H:%M":"%I:%M", tick_time);
 	strftime(date_text, sizeof(date_text), "%d %B %y", tick_time);
-	strftime(day_num, sizeof(day_num), "%j", tick_time);
-		
-	if(units_changed & DAY_UNIT){
-		refresh_date = true;
+
+	// SPACE SEED RANDOMIZER
+	if(units_changed & HOUR_UNIT){	
+	//if(units_changed & MINUTE_UNIT){	
+		refresh_seed = true;
 	}
 	
-	if(units_changed & HOUR_UNIT ){
+	if(refresh_seed){
 		hyperspace();
+		refresh_seed = false;
+	}
+	
+	// DATE
+	if(units_changed & DAY_UNIT){
+		refresh_date = true;
 	}
 	
 	if(refresh_date){
 		show_date(date_text, day_num);		
 		refresh_date = false;
-	}  
+	}
+	
 	show_time(the_time);
 }
 

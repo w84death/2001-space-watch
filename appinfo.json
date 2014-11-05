@@ -9,6 +9,21 @@
     "resources": {
         "media": [
             {
+                "file": "images/planet_2.png",
+                "name": "PLANET_2",
+                "type": "png"
+            },
+            {
+                "file": "images/planet_1.png",
+                "name": "PLANET_1",
+                "type": "png"
+            },
+            {
+                "file": "images/galactic.png",
+                "name": "GALAXY",
+                "type": "png"
+            },
+            {
                 "file": "images/asteroid_big.png",
                 "name": "ASTEROID_BIG",
                 "type": "png"
@@ -64,7 +79,7 @@
     "shortName": "2001: Space Watch",
     "uuid": "4d5b30cf-0896-407b-bda9-aca85ceaef6b",
     "versionCode": 1,
-    "versionLabel": "1.0",
+    "versionLabel": "1.07",
     "watchapp": {
         "watchface": true
     }

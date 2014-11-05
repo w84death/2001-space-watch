@@ -16,6 +16,8 @@
 #include "watchface.h"
 #include <pebble.h>
 
+#define SPACE_SEED 1
+	
 #define MAX_WIDTH 144
 #define MAX_HEIGHT 137
 #define MIN_STARS_SMALL 12
@@ -31,6 +33,9 @@
 #define	LUCK_ASTEROIDS_BIG 1
 #define MAX_ASTEROIDS_BIG 2
 
+#define	LUCK_GALAXY 4
+#define	LUCK_PLANET 1
+	
 static Window *s_window;
 static GBitmap *s_res_footer;
 static GBitmap *s_res_frame;
@@ -46,28 +51,43 @@ static TextLayer *label_batt;
 static TextLayer *label_day;
 static char battery_level[] = "000%";
 static Layer *layer_space;
-static int seed;
-static GBitmap *sprite_star_medium, *sprite_star_big_1, *sprite_star_big_2, *sprite_asteroid_small, *sprite_asteroid_medium, *sprite_asteroid_big;
+static GBitmap *sprite_star_medium, *sprite_star_big_1, *sprite_star_big_2;
+static GBitmap *sprite_asteroid_small, *sprite_asteroid_medium, *sprite_asteroid_big;
+static GBitmap *sprite_galaxy, *sprite_planet_1, *sprite_planet_2;
+static int seed = 0;
+static TextLayer *label_debug;
+//static char debug_msg[64];
 
 void show_time(char *time){
 	text_layer_set_text(label_time, time);
 }
 
-void hyperspace(){
+void set_new_seed(){
+	srand(time(NULL));
 	seed = rand();
-	layer_mark_dirty(layer_space);
+}
+
+void hyperspace(){
+	set_new_seed();
+	layer_mark_dirty(layer_space);		
 }
 
 void show_date(char *date,char *day){
 	text_layer_set_text(label_date, date);
 	text_layer_set_text(label_day, day);
-	seed = rand();
 }
 
 void update_battery(int level){
 	snprintf(battery_level, sizeof(battery_level), "%i%%", level);
 	text_layer_set_text(label_batt, battery_level);
 }
+
+/*
+void show_debug(){
+	snprintf(debug_msg, sizeof(debug_msg), "%i", seed);
+	text_layer_set_text(label_debug, debug_msg);
+}
+*/
 
 static void space_update_callback(Layer *me, GContext* ctx) {
 	/*
@@ -76,6 +96,12 @@ static void space_update_callback(Layer *me, GContext* ctx) {
 		work-in-progress
 	
 	*/
+	if(seed == 0){
+		set_new_seed();
+	}
+	srand(seed);
+	//show_debug();
+	
 	graphics_context_set_compositing_mode(ctx,GCompOpOr);
   GRect bounds_star_medium = sprite_star_medium->bounds;
 	GRect bounds_star_big_1 = sprite_star_big_1->bounds;
@@ -83,9 +109,10 @@ static void space_update_callback(Layer *me, GContext* ctx) {
 	GRect bounds_asteroid_small = sprite_asteroid_small->bounds;
 	GRect bounds_asteroid_medium = sprite_asteroid_medium->bounds;
 	GRect bounds_asteroid_big = sprite_asteroid_big->bounds;
+	GRect bounds_galaxy = sprite_galaxy->bounds;
+	GRect bounds_planet_1 = sprite_planet_1->bounds;
+	GRect bounds_planet_2 = sprite_planet_2->bounds;
 	int x, y, i;
-	
-	srand(seed);
 		
 	// STARTS
 	graphics_context_set_stroke_color(ctx, GColorWhite);
@@ -160,8 +187,32 @@ static void space_update_callback(Layer *me, GContext* ctx) {
 		}
 	}
 	
+	// galaxy
+	if(rand()%10 < LUCK_GALAXY){
+		x = rand() % MAX_WIDTH;
+		y = rand() % MAX_HEIGHT;
+		graphics_draw_bitmap_in_rect(ctx, sprite_galaxy, (GRect) { 
+			.origin = { x, y }, 
+				.size = bounds_galaxy.size
+		});	
+	}
 	
-	
+	// planets
+	if(rand()%10 < LUCK_PLANET){
+		x = rand() % MAX_WIDTH;
+		y = rand() % MAX_HEIGHT;
+		if(rand()%10 > 4){
+			graphics_draw_bitmap_in_rect(ctx, sprite_planet_1, (GRect) { 
+				.origin = { x, y }, 
+					.size = bounds_planet_1.size
+			});
+		}else{
+			graphics_draw_bitmap_in_rect(ctx, sprite_planet_2, (GRect) { 
+				.origin = { x, y }, 
+					.size = bounds_planet_2.size
+			});
+		}	
+	}
 	
 	
 	// CUSTOM EVENTS
@@ -230,6 +281,16 @@ static void initialise_ui(void) {
   text_layer_set_font(label_day, s_res_gothic_18);
   layer_add_child(window_get_root_layer(s_window), (Layer *)label_day);
   
+	/* layer_debug
+	label_debug = text_layer_create(GRect(0, 0, 144, 18));
+  text_layer_set_background_color(label_date, GColorBlack);
+  text_layer_set_text_color(label_date, GColorWhite);
+  text_layer_set_text(label_debug, "DEBUG");
+  text_layer_set_text_alignment(label_debug, GTextAlignmentCenter);
+  text_layer_set_font(label_debug, s_res_gothic_18);
+  layer_add_child(window_get_root_layer(s_window), (Layer *)label_debug);
+	*/
+	
 	// sprites
 	sprite_star_medium = gbitmap_create_with_resource(RESOURCE_ID_STAR_MEDIUM); 
 	sprite_star_big_1 = gbitmap_create_with_resource(RESOURCE_ID_STAR_BIG_1); 
@@ -237,6 +298,9 @@ static void initialise_ui(void) {
 	sprite_asteroid_small = gbitmap_create_with_resource(RESOURCE_ID_ASTEROID_SMALL); 
 	sprite_asteroid_medium = gbitmap_create_with_resource(RESOURCE_ID_ASTEROID_MEDIUM); 
 	sprite_asteroid_big = gbitmap_create_with_resource(RESOURCE_ID_ASTEROID_BIG); 
+	sprite_galaxy = gbitmap_create_with_resource(RESOURCE_ID_GALAXY);
+	sprite_planet_1 = gbitmap_create_with_resource(RESOURCE_ID_PLANET_1);
+	sprite_planet_2 = gbitmap_create_with_resource(RESOURCE_ID_PLANET_2);
 }
 
 static void destroy_ui(void) {
@@ -264,11 +328,8 @@ static void handle_window_unload(Window* window) {
 }
 
 void show_watchface(void) {
-  initialise_ui();
-	
-	layer_mark_dirty(layer_space);
-	
-  window_set_window_handlers(s_window, (WindowHandlers) {
+  initialise_ui();	
+	window_set_window_handlers(s_window, (WindowHandlers) {
     .unload = handle_window_unload,
   });
   window_stack_push(s_window, true);
