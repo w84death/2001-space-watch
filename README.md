@@ -3,12 +3,13 @@
 
 Practically infinite number of rich and fantastic backgrounds at each hour. You will never seen two identical backgrounds!
 
-<img src="http://p1x.in/media/pebble/2001_space_watch_anim.gif" alt="gif" style="float:left"/>
+<img src="http://p1x.in/media/pebble/2001_space_watch_anim.gif" alt="gif" />
+
 Yes, that's the power of procedural generation. Each hour new, little space is created there at your wrist.
 
 Second watch face promoting upcoming 2001: A Space Shooter game for Pebble.
 
-### FEATURES
+### Features
 
 * neat pixel art
 * procedurally generated backgrounds
@@ -16,6 +17,9 @@ Second watch face promoting upcoming 2001: A Space Shooter game for Pebble.
 * battery level (%)
 * day of year
 * full date
+
+### Download
+<a href="https://apps.getpebble.com/applications/54591fe85a7e52bd8b00007c">2001: Space Watch at apps.getpebble.com</a>
 
 ### Setup
 
