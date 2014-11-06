@@ -24,3 +24,12 @@ Second watch face promoting upcoming 2001: A Space Shooter game for Pebble.
 ### Setup
 
 <img src="http://p1x.in/media/pebble/2001_space_rules_poster.png" alt="poster"/>
+
+
+### Credits
+
+Krzysztof Jankowski
+
+P1X
+
+<a href="http://p1x.in">http://p1x.in</a>
