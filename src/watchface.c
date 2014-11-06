@@ -55,7 +55,7 @@ static GBitmap *sprite_star_medium, *sprite_star_big_1, *sprite_star_big_2;
 static GBitmap *sprite_asteroid_small, *sprite_asteroid_medium, *sprite_asteroid_big;
 static GBitmap *sprite_galaxy, *sprite_planet_1, *sprite_planet_2;
 static int seed = 0;
-static TextLayer *label_debug;
+//static TextLayer *label_debug;
 //static char debug_msg[64];
 
 void show_time(char *time){

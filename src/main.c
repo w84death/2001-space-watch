@@ -26,7 +26,8 @@ static bool refresh_seed = true;
 void tick_handler(struct tm *tick_time, TimeUnits units_changed){
 	strftime(the_time, sizeof(the_time),clock_is_24h_style()?"%H:%M":"%I:%M", tick_time);
 	strftime(date_text, sizeof(date_text), "%d %B %y", tick_time);
-
+	strftime(day_num, sizeof(day_num), "%j", tick_time);
+	
 	// SPACE SEED RANDOMIZER
 	if(units_changed & HOUR_UNIT){	
 	//if(units_changed & MINUTE_UNIT){	
