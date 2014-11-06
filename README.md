@@ -28,8 +28,8 @@ Second watch face promoting upcoming 2001: A Space Shooter game for Pebble.
 
 ### Credits
 
-Krzysztof Jankowski
-
-P1X
-
-<a href="http://p1x.in">http://p1x.in</a>
+Krzysztof Jankowski 
+- @w84death
+- P1X
+- <a href="http://p1x.in">http://p1x.in</a>
+- kj@p1x.in
