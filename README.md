@@ -3,6 +3,7 @@
 
 Practically infinite number of rich and fantastic backgrounds at each hour. You will never seen two identical backgrounds!
 
+<img src="http://p1x.in/media/pebble/2001_space_watch_anim.gif" alt="gif" style="float:left"/>
 Yes, that's the power of procedural generation. Each hour new, little space is created there at your wrist.
 
 Second watch face promoting upcoming 2001: A Space Shooter game for Pebble.
