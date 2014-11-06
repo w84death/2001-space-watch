@@ -14,7 +14,7 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include <pebble.h>
-#include <watchface.h>
+#include "watchface.h"
 
 #define LAST_SEED_TIMESTAMP 1
 static char the_time[] = "00:00";
@@ -26,6 +26,7 @@ static bool refresh_seed = true;
 void tick_handler(struct tm *tick_time, TimeUnits units_changed){
 	strftime(the_time, sizeof(the_time),clock_is_24h_style()?"%H:%M":"%I:%M", tick_time);
 	strftime(date_text, sizeof(date_text), "%d %B %y", tick_time);
+	strftime(day_num, sizeof(day_num), "%d", tick_time);
 
 	// SPACE SEED RANDOMIZER
 	if(units_changed & HOUR_UNIT){	
@@ -55,13 +56,12 @@ void batteryChanged(BatteryChargeState batt) {
 	update_battery(batt.charge_percent);
 }
 
-void handle_init(void) {
+void handle_init() {
 	show_watchface();
-	
 	// set time
 	time_t now = time(NULL);
-  struct tm *current_time = localtime(&now);
-  tick_handler(current_time, SECOND_UNIT);
+	struct tm *current_time = localtime(&now);
+	tick_handler(current_time, SECOND_UNIT);
 
 	// set battery
 	BatteryChargeState batt = battery_state_service_peek();
@@ -72,14 +72,14 @@ void handle_init(void) {
 	battery_state_service_subscribe(batteryChanged);
 }
 
-void handle_deinit(void) {
-  hide_watchface();
+void handle_deinit() {
+	hide_watchface();
 	tick_timer_service_unsubscribe();
 	battery_state_service_unsubscribe();
 }
 
-int main(void) {
-  handle_init();
-  app_event_loop();
-  handle_deinit();
+int main() {
+	handle_init();
+	app_event_loop();
+	handle_deinit();
 }
