@@ -9,6 +9,41 @@
     "resources": {
         "media": [
             {
+                "file": "images/astronaut_flag.png",
+                "name": "ASTRONAUT_FLAG",
+                "type": "png"
+            },
+            {
+                "file": "images/astronaut_fly.png",
+                "name": "ASTRONAUT_FLY",
+                "type": "png"
+            },
+            {
+                "file": "images/satelite.png",
+                "name": "SATELITE",
+                "type": "png"
+            },
+            {
+                "file": "images/rocket.png",
+                "name": "ROCKET",
+                "type": "png"
+            },
+            {
+                "file": "images/asteroid_small_3.png",
+                "name": "ASTEROID_SMALL_3",
+                "type": "png"
+            },
+            {
+                "file": "images/asteroid_small_2.png",
+                "name": "ASTEROID_SMALL_2",
+                "type": "png"
+            },
+            {
+                "file": "images/asteroid_medium_2.png",
+                "name": "ASTEROID_MEDIUM_2",
+                "type": "png"
+            },
+            {
                 "file": "images/planet_2.png",
                 "name": "PLANET_2",
                 "type": "png"
@@ -79,7 +114,7 @@
     "shortName": "2001: Space Watch",
     "uuid": "4d5b30cf-0896-407b-bda9-aca85ceaef6b",
     "versionCode": 1,
-    "versionLabel": "1.10",
+    "versionLabel": "1.12",
     "watchapp": {
         "watchface": true
     }

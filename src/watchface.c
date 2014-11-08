@@ -16,8 +16,7 @@
 #include "watchface.h"
 #include <pebble.h>
 
-#define SPACE_SEED 1
-	
+// procedural generation rulez
 #define MAX_WIDTH 144
 #define MAX_HEIGHT 137
 #define MIN_STARS_SMALL 12
@@ -25,16 +24,20 @@
 #define MIN_STARS_MEDIUM 4
 #define MAX_STARS_MEDIUM 8
 #define MAX_STARS_BIG 4
-
-#define	LUCK_ASTEROIDS_SMALL 5
 #define MAX_ASTEROIDS_SMALL 3
-#define	LUCK_ASTEROIDS_MEDIUM 3
 #define MAX_ASTEROIDS_MEDIUM  2
-#define	LUCK_ASTEROIDS_BIG 1
 #define MAX_ASTEROIDS_BIG 2
+// luck!
+#define	LUCK_ASTEROIDS_SMALL 50
+#define	LUCK_ASTEROIDS_MEDIUM 35
+#define	LUCK_GALAXY 20
+#define	LUCK_ROCKET 15
+#define	LUCK_ASTEROIDS_BIG 15
+#define	LUCK_SATELITE 12
+#define	LUCK_ASTRONAUT 10
+#define	LUCK_PLANET 8
 
-#define	LUCK_GALAXY 4
-#define	LUCK_PLANET 1
+// /end of procedural generation rulez
 	
 static Window *s_window;
 static GBitmap *s_res_footer;
@@ -52,9 +55,13 @@ static TextLayer *label_day;
 static char battery_level[] = "000%";
 static Layer *layer_space;
 static GBitmap *sprite_star_medium, *sprite_star_big_1, *sprite_star_big_2;
-static GBitmap *sprite_asteroid_small, *sprite_asteroid_medium, *sprite_asteroid_big;
+static GBitmap *sprite_asteroid_small, *sprite_asteroid_small_2, *sprite_asteroid_small_3;
+static GBitmap *sprite_asteroid_medium, *sprite_asteroid_medium_2, *sprite_asteroid_big;
 static GBitmap *sprite_galaxy, *sprite_planet_1, *sprite_planet_2;
+static GBitmap *sprite_rocket,*sprite_satelite;
+static GBitmap *sprite_astronaut_fly,*sprite_astronaut_flag;
 static int seed = 0;
+static bool temp_modifier = false;
 //static TextLayer *label_debug;
 //static char debug_msg[64];
 
@@ -107,11 +114,18 @@ static void space_update_callback(Layer *me, GContext* ctx) {
 	GRect bounds_star_big_1 = sprite_star_big_1->bounds;
 	GRect bounds_star_big_2 = sprite_star_big_2->bounds;
 	GRect bounds_asteroid_small = sprite_asteroid_small->bounds;
+	GRect bounds_asteroid_small_2 = sprite_asteroid_small_2->bounds;
+	GRect bounds_asteroid_small_3 = sprite_asteroid_small_3->bounds;
 	GRect bounds_asteroid_medium = sprite_asteroid_medium->bounds;
+	GRect bounds_asteroid_medium_2 = sprite_asteroid_medium_2->bounds;
 	GRect bounds_asteroid_big = sprite_asteroid_big->bounds;
 	GRect bounds_galaxy = sprite_galaxy->bounds;
 	GRect bounds_planet_1 = sprite_planet_1->bounds;
 	GRect bounds_planet_2 = sprite_planet_2->bounds;
+	GRect bounds_rocket = sprite_rocket->bounds;
+	GRect bounds_satelite = sprite_satelite->bounds;
+	GRect bounds_astronaut_fly = sprite_astronaut_fly->bounds;
+	GRect bounds_astronaut_flag = sprite_astronaut_flag->bounds;
 	int x, y, i;
 		
 	// STARTS
@@ -152,43 +166,83 @@ static void space_update_callback(Layer *me, GContext* ctx) {
 	// ASTEROIDS
 	
 	// big
-	if(rand()%10 < LUCK_ASTEROIDS_BIG){
+	if(rand()%100 < LUCK_ASTEROIDS_BIG){
 		for(i=0; i< 1 + rand()%MAX_ASTEROIDS_BIG; i++){
 			x = rand() % MAX_WIDTH;
 			y = rand() % MAX_HEIGHT;
 			graphics_draw_bitmap_in_rect(ctx, sprite_asteroid_big, (GRect) { 
 				.origin = { x, y }, 
 					.size = bounds_asteroid_big.size
-			});	
+			});
+			
+			// astronaut
+			if(rand()%100 < LUCK_ASTRONAUT && i == 0){
+				temp_modifier =  true;
+				graphics_draw_bitmap_in_rect(ctx, sprite_astronaut_flag, (GRect) { 
+					.origin = { x+5, y-18 }, 
+						.size = bounds_astronaut_flag.size
+				});
+			}			
 		}
 	}
 	
+	// astronaut fly
+	if(!temp_modifier && rand()%100 < LUCK_ASTRONAUT){
+		x = (int)(MAX_WIDTH*0.2) + rand() % (int)(MAX_WIDTH*0.6);
+		y = (int)(MAX_HEIGHT*0.2) + rand() % (int)(MAX_HEIGHT*0.6);
+		temp_modifier =  false;
+		graphics_draw_bitmap_in_rect(ctx, sprite_astronaut_fly, (GRect) { 
+			.origin = { x, y }, 
+				.size = bounds_astronaut_fly.size
+		});
+	}
+	
 	// medium
-	if(rand()%10 < LUCK_ASTEROIDS_MEDIUM){
+	if(rand()%100 < LUCK_ASTEROIDS_MEDIUM){
 		for(i=0; i<1 + rand()%MAX_ASTEROIDS_MEDIUM; i++){
 			x = rand() % MAX_WIDTH;
 			y = rand() % MAX_HEIGHT;
-			graphics_draw_bitmap_in_rect(ctx, sprite_asteroid_medium, (GRect) { 
-				.origin = { x, y }, 
-					.size = bounds_asteroid_medium.size
-			});	
+			if(rand()%10<4){
+				graphics_draw_bitmap_in_rect(ctx, sprite_asteroid_medium, (GRect) { 
+					.origin = { x, y }, 
+						.size = bounds_asteroid_medium.size
+				});	
+			}else{
+				graphics_draw_bitmap_in_rect(ctx, sprite_asteroid_medium_2, (GRect) { 
+					.origin = { x, y }, 
+						.size = bounds_asteroid_medium_2.size
+				});
+			}
 		}
 	}
 	
 	// small
-	if(rand()%10 < LUCK_ASTEROIDS_SMALL){
+	if(rand()%100 < LUCK_ASTEROIDS_SMALL){
 		for(i=0; i<1 + rand()%MAX_ASTEROIDS_SMALL; i++){
 			x = rand() % MAX_WIDTH;
 			y = rand() % MAX_HEIGHT;
-			graphics_draw_bitmap_in_rect(ctx, sprite_asteroid_small, (GRect) { 
-				.origin = { x, y }, 
-					.size = bounds_asteroid_small.size
-			});	
+			if(rand()%10 < 3){
+				graphics_draw_bitmap_in_rect(ctx, sprite_asteroid_small, (GRect) { 
+					.origin = { x, y }, 
+						.size = bounds_asteroid_small.size
+				});	
+			}else
+			if(rand()%10 < 6){
+				graphics_draw_bitmap_in_rect(ctx, sprite_asteroid_small_2, (GRect) { 
+					.origin = { x, y }, 
+						.size = bounds_asteroid_small_2.size
+				});
+			}else{
+				graphics_draw_bitmap_in_rect(ctx, sprite_asteroid_small_3, (GRect) { 
+					.origin = { x, y }, 
+						.size = bounds_asteroid_small_3.size
+				});
+			}
 		}
 	}
 	
 	// galaxy
-	if(rand()%10 < LUCK_GALAXY){
+	if(rand()%100 < LUCK_GALAXY){
 		x = rand() % MAX_WIDTH;
 		y = rand() % MAX_HEIGHT;
 		graphics_draw_bitmap_in_rect(ctx, sprite_galaxy, (GRect) { 
@@ -198,7 +252,7 @@ static void space_update_callback(Layer *me, GContext* ctx) {
 	}
 	
 	// planets
-	if(rand()%10 < LUCK_PLANET){
+	if(rand()%100 < LUCK_PLANET){
 		x = rand() % MAX_WIDTH;
 		y = rand() % MAX_HEIGHT;
 		if(rand()%10 > 4){
@@ -214,8 +268,28 @@ static void space_update_callback(Layer *me, GContext* ctx) {
 		}	
 	}
 	
+	// satelite
+	if(rand()%100 < LUCK_SATELITE){
+		x = rand() % MAX_WIDTH;
+		y = rand() % MAX_HEIGHT;
+		graphics_draw_bitmap_in_rect(ctx, sprite_satelite, (GRect) { 
+			.origin = { x, y }, 
+				.size = bounds_satelite.size
+		});	
+	}
 	
-	// CUSTOM EVENTS
+	// rocket
+	if(rand()%100 < LUCK_ROCKET){
+		x = rand() % (int)(MAX_WIDTH*0.5);
+		y = rand() % MAX_HEIGHT;
+		graphics_draw_bitmap_in_rect(ctx, sprite_rocket, (GRect) { 
+			.origin = { x+2, y-2 }, 
+				.size = bounds_rocket.size
+		});
+		for(i=x; i>0; i-=4){
+			graphics_draw_pixel(ctx, (GPoint){i,y});
+		}
+	}
 	
 }
 
@@ -296,11 +370,18 @@ static void initialise_ui(void) {
 	sprite_star_big_1 = gbitmap_create_with_resource(RESOURCE_ID_STAR_BIG_1); 
 	sprite_star_big_2  = gbitmap_create_with_resource(RESOURCE_ID_STAR_BIG_2); 
 	sprite_asteroid_small = gbitmap_create_with_resource(RESOURCE_ID_ASTEROID_SMALL); 
-	sprite_asteroid_medium = gbitmap_create_with_resource(RESOURCE_ID_ASTEROID_MEDIUM); 
+	sprite_asteroid_small_2 = gbitmap_create_with_resource(RESOURCE_ID_ASTEROID_SMALL_2); 
+	sprite_asteroid_small_3 = gbitmap_create_with_resource(RESOURCE_ID_ASTEROID_SMALL_3); 
+	sprite_asteroid_medium = gbitmap_create_with_resource(RESOURCE_ID_ASTEROID_MEDIUM);
+	sprite_asteroid_medium_2 = gbitmap_create_with_resource(RESOURCE_ID_ASTEROID_MEDIUM_2);
 	sprite_asteroid_big = gbitmap_create_with_resource(RESOURCE_ID_ASTEROID_BIG); 
 	sprite_galaxy = gbitmap_create_with_resource(RESOURCE_ID_GALAXY);
 	sprite_planet_1 = gbitmap_create_with_resource(RESOURCE_ID_PLANET_1);
 	sprite_planet_2 = gbitmap_create_with_resource(RESOURCE_ID_PLANET_2);
+	sprite_rocket = gbitmap_create_with_resource(RESOURCE_ID_ROCKET);
+	sprite_satelite = gbitmap_create_with_resource(RESOURCE_ID_SATELITE);
+	sprite_astronaut_fly = gbitmap_create_with_resource(RESOURCE_ID_ASTRONAUT_FLY);
+	sprite_astronaut_flag = gbitmap_create_with_resource(RESOURCE_ID_ASTRONAUT_FLAG);
 }
 
 static void destroy_ui(void) {
@@ -319,8 +400,18 @@ static void destroy_ui(void) {
 	gbitmap_destroy(sprite_star_big_1);
 	gbitmap_destroy(sprite_star_big_2);
 	gbitmap_destroy(sprite_asteroid_small);
+	gbitmap_destroy(sprite_asteroid_small_2);
+	gbitmap_destroy(sprite_asteroid_small_3);
 	gbitmap_destroy(sprite_asteroid_medium);
+	gbitmap_destroy(sprite_asteroid_medium_2);
 	gbitmap_destroy(sprite_asteroid_big);
+	gbitmap_destroy(sprite_galaxy);
+	gbitmap_destroy(sprite_planet_1);
+	gbitmap_destroy(sprite_planet_2);
+	gbitmap_destroy(sprite_rocket);
+	gbitmap_destroy(sprite_satelite);
+	gbitmap_destroy(sprite_astronaut_fly);
+	gbitmap_destroy(sprite_astronaut_flag);
 }
 
 static void handle_window_unload(Window* window) {
